@@ -22,9 +22,29 @@ contract RogueStaking is Ownable(msg.sender), AccessControl {
         _grantRole(governanceContract, _governanceContract);
     }
 
-    function withdrawFunds() external onlyOwner {
-        uint256 amount = stakes[address(this)];
+    function stake(uint amount) external {
+
+        uint usdValue = getUsdValue(amount);
+
+        require(usdValue >= minimumStakeAmount, "cannot stake below the allowed minimum value");
+
+        stakingToken.transferFrom(msg.sender, address(this), amount);
+
+        stakes[msg.sender] += usdValue;
+
     }
+
+    function getUsdValue(uint amount) private view returns (uint actual){
+        (,int256 priceFeeds,,,) = aggregatorInterface.latestRoundData();
+        
+        uint decimalValue = aggregatorInterface.decimals();
+
+        actual = (amount * uint(priceFeeds))/(10 ** decimalValue); 
+    }
+
+    // function withdrawFunds() external onlyOwner {
+    //     uint256 amount = stakes[address(this)];
+    // }
 
     function changeStakeAmount(uint amount) external onlyRole(governanceContract){
         require(amount > 0, "cannot set amount to zero");
