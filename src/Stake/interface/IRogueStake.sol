@@ -1,11 +1,6 @@
-
-
-
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity 0.8.25;
 
 interface IRogueStake {
-    
-
-    function changeStakingAmount(uint amount) external;
+    function changeStakingAmount(uint256 amount) external;
 }
