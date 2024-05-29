@@ -13,6 +13,8 @@ contract RogueStaking is Ownable(msg.sender), AccessControl {
     IERC20 public stakingToken;
     AggregatorV3Interface public aggregatorInterface;
 
+    uint public minimumStakeAmount;
+
     constructor(address _stakingContractAddress, address _governanceContract, address _feedsPrice) {
         stakingToken = IERC20(_stakingContractAddress);
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
@@ -22,5 +24,10 @@ contract RogueStaking is Ownable(msg.sender), AccessControl {
 
     function withdrawFunds() external onlyOwner {
         uint256 amount = stakes[address(this)];
+    }
+
+    function changeStakeAmount(uint amount) external onlyRole(governanceContract){
+        require(amount > 0, "cannot set amount to zero");
+        minimumStakeAmount = amount;
     }
 }
