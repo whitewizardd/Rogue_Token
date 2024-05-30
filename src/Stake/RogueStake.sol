@@ -23,6 +23,7 @@ contract RogueStaking is Ownable(msg.sender), AccessControl {
         uint256 usdValue;
         uint256 stakedAt;
         uint256 endedAt;
+        uint256 rewardAmount;
         bool closed;
     }
 
@@ -75,6 +76,7 @@ contract RogueStaking is Ownable(msg.sender), AccessControl {
         // close the stake
         stakeInfo.closed = true;
         stakeInfo.endedAt = block.timestamp;
+        stakeInfo.rewardAmount = reward;
 
         // Apply withdrawal fee
         uint256 withdrawalFee = (stakeInfo.amount * withdrawalFeeRate) / 10000;
