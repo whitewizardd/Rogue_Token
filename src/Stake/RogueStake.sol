@@ -13,10 +13,10 @@ contract RogueStaking is Ownable(msg.sender), AccessControl {
     IERC20 public stakingToken;
     IERC20 public rewardToken;
     AggregatorV3Interface public aggregatorInterface;
-    uint public rewardRate;
-    uint public withdrawalFeeRate;
+    uint256 public rewardRate;
+    uint8 public withdrawalFeeRate;
 
-    uint public minimumStakeAmount;
+    uint256 public minimumStakeAmount;
 
     struct Stake {
         uint256 amount;
@@ -32,7 +32,14 @@ contract RogueStaking is Ownable(msg.sender), AccessControl {
     event RewardRateUpdated(uint256 newRewardRate);
     event FeeRatesUpdated(uint256 newStakingFeeRate, uint256 newWithdrawalFeeRate, uint256 newPerformanceFeeRate);
 
-    constructor(address _stakingContractAddress, address _governanceContract, address _feedsPrice, uint _rewardRate, address _rewardToken, uint withdrawRate) {
+    constructor(
+        address _stakingContractAddress,
+        address _governanceContract,
+        address _feedsPrice,
+        uint256 _rewardRate,
+        address _rewardToken,
+        uint8 withdrawRate
+    ) {
         stakingToken = IERC20(_stakingContractAddress);
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         aggregatorInterface = AggregatorV3Interface(_feedsPrice);
@@ -74,15 +81,16 @@ contract RogueStaking is Ownable(msg.sender), AccessControl {
         uint256 netAmount = stakeInfo.amount - withdrawalFee;
 
         stakingToken.transfer(msg.sender, netAmount);
+        stakingToken.transfer(owner(), withdrawalFee);
         rewardToken.transfer(msg.sender, reward);
 
         emit Withdrawn(msg.sender, netAmount, reward);
     }
 
-    function getUsdValue(uint amount) private view returns (uint actual){
-        (,int256 priceFeeds,,,) = aggregatorInterface.latestRoundData();
-        uint decimalValue = aggregatorInterface.decimals();
-        actual = (amount * uint(priceFeeds))/(10 ** decimalValue); 
+    function getUsdValue(uint256 amount) private view returns (uint256 actual) {
+        (, int256 priceFeeds,,,) = aggregatorInterface.latestRoundData();
+        uint256 decimalValue = aggregatorInterface.decimals();
+        actual = (amount * uint256(priceFeeds)) / (10 ** decimalValue);
     }
 
     function getUserStakes(address user) external view returns (Stake[] memory) {
@@ -95,14 +103,25 @@ contract RogueStaking is Ownable(msg.sender), AccessControl {
         return reward;
     }
 
-    function changeStakeAmount(uint amount) external onlyRole(governanceContract){
-        require(amount > 0, "cannot set amount to zero");
+    function changeStakeAmount(uint8 amount) external onlyRole(governanceContract) {
+        checkInput(amount);
         minimumStakeAmount = amount;
     }
 
+    function changeWithdrawlRate(uint8 amount) external onlyRole(governanceContract){
+        checkInput(amount);
+        withdrawalFeeRate = amount;
+    }
+
+    function checkInput(uint8 amount) private pure {
+        if (amount < 1) {
+            revert("cannot set amount to zero");
+        }
+    }
+
     function getUserTotalStaked(address user) external view returns (uint256 totalStaked) {
-        Stake[] memory userStakes = stakes[user]; 
-        for (uint i = 0; i < userStakes.length; i++) {
+        Stake[] memory userStakes = stakes[user];
+        for (uint256 i = 0; i < userStakes.length; i++) {
             totalStaked += userStakes[i].usdValue;
         }
     }
