@@ -105,7 +105,7 @@ contract RogueStaking is Ownable(msg.sender), AccessControl {
         return reward;
     }
 
-    function changeStakeAmount(uint8 amount) external onlyRole(governanceContract) {
+    function changeStakeAmount(uint256 amount) external onlyRole(governanceContract) {
         checkInput(amount);
         minimumStakeAmount = amount;
     }
@@ -115,7 +115,7 @@ contract RogueStaking is Ownable(msg.sender), AccessControl {
         withdrawalFeeRate = amount;
     }
 
-    function checkInput(uint8 amount) private pure {
+    function checkInput(uint256 amount) private pure {
         if (amount < 1) {
             revert("cannot set amount to zero");
         }

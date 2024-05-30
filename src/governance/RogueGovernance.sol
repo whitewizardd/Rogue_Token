@@ -41,7 +41,8 @@ contract RogueGovernance {
         Proposal_Staking_Amount,
         Voting_Amount,
         Quorum,
-        Staking_Amount
+        Staking_Amount,
+        Withdrawal_Rate
     }
 
     mapping(uint256 => Proposal) public proposals;
@@ -113,7 +114,9 @@ contract RogueGovernance {
             } else if (proposal.executionType == ExecutionType.Quorum) {
                 changeQuorum(proposal.newValue);
             } else if (proposal.executionType == ExecutionType.Staking_Amount) {
-                iRogue.changeStakingAmount(proposal.newValue);
+                iRogue.changeStakeAmount(proposal.newValue);
+            } else if (proposal.executionType == ExecutionType.Withdrawal_Rate){
+                iRogue.changeWithdrawlRate(uint8(proposal.newValue));
             }
 
             // emit something

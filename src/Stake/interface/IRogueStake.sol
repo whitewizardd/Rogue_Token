@@ -2,5 +2,6 @@
 pragma solidity 0.8.25;
 
 interface IRogueStake {
-    function changeStakingAmount(uint256 amount) external;
+    function changeStakeAmount(uint256 amount) external;
+    function changeWithdrawlRate(uint8 amount) external;
 }
