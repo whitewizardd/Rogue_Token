@@ -69,19 +69,18 @@ contract RogueGovernance {
 
     function vote(uint256 proposalId, Decision decision) external {
         Proposal storage proposal = proposals[proposalId];
-
         require(!proposal.executed, "Already executed");
         require(proposal.endTime >= block.timestamp, "Already ended");
         require(iErc20.balanceOf(msg.sender) >= allowedTokenVotingBalance, "not enough  balance");
         require(!hasvoted[proposalId][msg.sender], "Already voted");
+
+        hasvoted[proposalId][msg.sender] = true;
 
         if (decision == Decision.For) {
             proposal.forVote = proposal.forVote + 1;
         } else {
             proposal.againstVote = proposal.againstVote + 1;
         }
-
-        hasvoted[proposalId][msg.sender] = true;
 
         // should emit or do something.
     }
