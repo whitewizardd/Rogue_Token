@@ -19,15 +19,23 @@ contract GovernanceTest is Test {
     }
 
     function testCreateProposal() external {
-
         string memory desc = "proposal to change the minimum proposal token balance";
-
-        governance.createProposal(desc, 1000, 30 minutes, RogueGovernance.ExecutionType.Staking_Amount);
-
+        governance.createProposal(desc, 1000, 30 minutes, RogueGovernance.ExecutionType.Proposal_Staking_Amount);
         (uint id,string memory description,,,,,,,) = governance.proposals(1);
         console.log("here is the output", id);
         assertEq(governance.proposalCount(), 1);
         assertEq(description, desc);
     }
 
+    function testChangeStakingAmount() external {
+        assertEq(governance.allowedStakingTokenAmoount(), 0);
+        governance.createProposal("", 1000, 30 minutes, RogueGovernance.ExecutionType.Proposal_Staking_Amount);
+        governance.vote(1, RogueGovernance.Decision.For);
+        vm.warp(1 hours);
+        string memory response = governance.executeProposal(1);
+        assertEq(response, "action performed");
+        assertEq(governance.allowedStakingTokenAmoount(), 1000);
+    }
+
+    
 }

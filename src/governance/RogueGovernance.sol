@@ -53,6 +53,7 @@ contract RogueGovernance {
         require(
             iErc20.balanceOf(msg.sender) > allowedStakingTokenAmoount, "does not posses enough token to create proposal"
         );
+        require(newValue > 0, "intended target value cannot be set to zero");
 
         uint256 proposeCount = ++proposalCount;
 
@@ -115,7 +116,6 @@ contract RogueGovernance {
             } else if (proposal.executionType == ExecutionType.Withdrawal_Rate){
                 iRogue.changeWithdrawlRate(uint8(proposal.newValue));
             }
-
             // emit something
             return "action performed";
         } else {
