@@ -1,7 +1,7 @@
 
 
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
-pragma solidity 0.8.25;
+pragma solidity >=0.8.20;
 import {Test, console} from "forge-std/Test.sol";
 import {RogueGovernance} from "src/governance/RogueGovernance.sol";
 import {RogueGovernanceToken} from "src/governance/GovernanceToken.sol";
@@ -19,13 +19,15 @@ contract GovernanceTest is Test {
     }
 
     function testCreateProposal() external {
-        // vm.startPrank(owner);
 
-        governance.createProposal("proposal to change the minimum proposal token balance", 1000, 30 minutes, RogueGovernance.ExecutionType.Staking_Amount);
+        string memory desc = "proposal to change the minimum proposal token balance";
 
-        (,,,,,,,,,,) = governance.proposals(1);
-        console.log("here is the output","");
-        // assertEq(governance.proposalCount, 1);
+        governance.createProposal(desc, 1000, 30 minutes, RogueGovernance.ExecutionType.Staking_Amount);
+
+        (uint id,string memory description,,,,,,,) = governance.proposals(1);
+        console.log("here is the output", id);
+        assertEq(governance.proposalCount(), 1);
+        assertEq(description, desc);
     }
 
 }

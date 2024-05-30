@@ -25,10 +25,8 @@ contract RogueGovernance {
         Decision decision;
         uint256 forVote;
         uint256 againstVote;
-        uint256 abstainVote;
         bool executed;
         ExecutionType executionType;
-        mapping(address => bool) hasvoted;
     }
 
     enum Decision {
@@ -48,6 +46,7 @@ contract RogueGovernance {
     mapping(uint256 => Proposal) public proposals;
     uint256 public allowedStakingTokenAmoount;
     uint256 public allowedTokenVotingBalance;
+    mapping(uint => mapping(address => bool)) hasvoted;
 
     function createProposal(string memory desc, uint256 newValue, uint256 deadline, ExecutionType exeType) external {
         require(deadline > block.timestamp, "deadline must be greater than current time");
@@ -73,17 +72,15 @@ contract RogueGovernance {
         require(!proposal.executed, "Already executed");
         require(proposal.endTime >= block.timestamp, "Already ended");
         require(iErc20.balanceOf(msg.sender) >= allowedTokenVotingBalance, "not enough  balance");
-        require(!proposal.hasvoted[msg.sender], "Already voted");
+        require(!hasvoted[proposalId][msg.sender], "Already voted");
 
         if (decision == Decision.For) {
             proposal.forVote = proposal.forVote + 1;
-        } else if (decision == Decision.Against) {
-            proposal.againstVote = proposal.againstVote + 1;
         } else {
-            proposal.abstainVote = proposal.abstainVote + 1;
+            proposal.againstVote = proposal.againstVote + 1;
         }
 
-        proposal.hasvoted[msg.sender] = true;
+        hasvoted[proposalId][msg.sender] = true;
 
         // should emit or do something.
     }
@@ -104,9 +101,9 @@ contract RogueGovernance {
         Proposal storage proposal = proposals[proposalId];
         require(block.timestamp > proposal.endTime, "Not ended");
         require(!proposal.executed, "Already executed");
-        require(proposal.forVote + proposal.abstainVote + proposal.againstVote >= quorum, "Quorum not met");
+        require(proposal.forVote + proposal.againstVote >= quorum, "Quorum not met");
 
-        if (proposal.forVote > proposal.abstainVote && proposal.forVote > proposal.againstVote) {
+        if (proposal.forVote > proposal.againstVote) {
             if (proposal.executionType == ExecutionType.Proposal_Staking_Amount) {
                 changeStakingAmount(proposal.newValue);
             } else if (proposal.executionType == ExecutionType.Voting_Amount) {
