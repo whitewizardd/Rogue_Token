@@ -35,7 +35,15 @@ contract GovernanceTest is Test {
         string memory response = governance.executeProposal(1);
         assertEq(response, "action performed");
         assertEq(governance.allowedStakingTokenAmoount(), 1000);
+        (,,,,,,,bool executed,) = governance.proposals(1);
+        assertTrue(executed);
     }
 
-    
+    function testAlreadyVotedUserCannotVoteAgain() external {
+        governance.createProposal("", 1000, 30 minutes, RogueGovernance.ExecutionType.Proposal_Staking_Amount);
+        governance.vote(1, RogueGovernance.Decision.For);
+
+        vm.expectRevert("Already voted");
+        governance.vote(1, RogueGovernance.Decision.For);
+    }
 }

@@ -81,7 +81,6 @@ contract RogueGovernance {
         } else {
             proposal.againstVote = proposal.againstVote + 1;
         }
-
         // should emit or do something.
     }
 
@@ -104,6 +103,7 @@ contract RogueGovernance {
         require(proposal.forVote + proposal.againstVote >= quorum, "Quorum not met");
 
         if (proposal.forVote > proposal.againstVote) {
+            proposal.executed = true;
             if (proposal.executionType == ExecutionType.Proposal_Staking_Amount) {
                 changeStakingAmount(proposal.newValue);
             } else if (proposal.executionType == ExecutionType.Voting_Amount) {
