@@ -13,7 +13,6 @@ contract GovernanceTest is Test {
     RogueGovernanceToken private governanceToken;
     address private owner = address(0xa);
     RogueStaking private stakingContract;
-    
 
     function setUp() external {
         vm.startPrank(owner);
