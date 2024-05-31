@@ -1,3 +1,4 @@
+-include .env
 
 test-governance:
 	@echo "testing governance"
