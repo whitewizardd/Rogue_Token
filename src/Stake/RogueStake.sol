@@ -5,6 +5,7 @@ import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
 import "lib/openzeppelin-contracts/contracts/access/AccessControl.sol";
 import "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "lib/chainlink/contracts/src/v0.8/shared/interfaces/AggregatorV3Interface.sol";
+import {console} from "forge-std/Test.sol";
 
 contract RogueStaking is Ownable(msg.sender), AccessControl {
     bytes32 public constant governanceContract = bytes32("governance_only_contract");
@@ -13,10 +14,10 @@ contract RogueStaking is Ownable(msg.sender), AccessControl {
     IERC20 public stakingToken;
     IERC20 public rewardToken;
     AggregatorV3Interface public aggregatorInterface;
-    uint256 public rewardRate;
-    uint8 public withdrawalFeeRate;
+    uint256 public rewardRate = 15;
+    uint8 public withdrawalFeeRate = 5;
 
-    uint256 public minimumStakeAmount;
+    uint256 public minimumStakeAmount = 1;
 
     struct Stake {
         uint256 amount;
@@ -107,6 +108,7 @@ contract RogueStaking is Ownable(msg.sender), AccessControl {
 
     function changeStakeAmount(uint256 amount) external onlyRole(governanceContract) {
         checkInput(amount);
+        console.log("inside the stake contract ::: ",amount);
         minimumStakeAmount = amount;
     }
 

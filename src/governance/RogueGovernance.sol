@@ -3,18 +3,19 @@ pragma solidity 0.8.25;
 
 import "lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 import "src/Stake/interface/IRogueStake.sol";
+import "lib/openzeppelin-contracts/contracts/access/Ownable.sol";
+import {console} from "forge-std/Test.sol";
 
-contract RogueGovernance {
+contract RogueGovernance is Ownable(msg.sender) {
     address public immutable governanceToken;
     IERC20 public iErc20;
     uint256 public proposalCount;
     uint256 public quorum;
     IRogueStake public iRogue;
 
-    constructor(address _governanceToken, address _stakingContract) {
+    constructor(address _governanceToken) {
         governanceToken = _governanceToken;
         iErc20 = IERC20(_governanceToken);
-        iRogue = IRogueStake(_stakingContract);
     }
 
     struct Proposal {
@@ -121,5 +122,9 @@ contract RogueGovernance {
             return "cannot perform action, for the proposal not reached";
         }
         // should revert or do something
+    }
+
+    function setStakingContract(address _stakingAddress) external onlyOwner{
+        iRogue = IRogueStake(_stakingAddress);
     }
 }
