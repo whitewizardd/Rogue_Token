@@ -53,7 +53,6 @@ contract GovernanceTest is Test {
     function testAlreadyVotedUserCannotVoteAgain() external {
         governance.createProposal("", 1000, 30 minutes, RogueGovernance.ExecutionType.Proposal_Staking_Amount);
         governance.vote(1, RogueGovernance.Decision.For);
-
         vm.expectRevert("Already voted");
         governance.vote(1, RogueGovernance.Decision.For);
     }
@@ -61,15 +60,10 @@ contract GovernanceTest is Test {
     function testChangeStakeAmountInStakeContract() external {
         governance.setStakingContract(address(stakingContract));
         governance.createProposal("", 5, 30 minutes, RogueGovernance.ExecutionType.Staking_Amount);
-        console.log("staking contract address ::: ", address(stakingContract));
-
         governance.vote(1, RogueGovernance.Decision.For);
-
         vm.warp(1 hours);
         governance.executeProposal(1);
-
-        uint response = stakingContract.minimumStakeAmount();
-        
+        uint response = stakingContract.minimumStakeAmount();        
         assertEq(response , 5);
     }
 }
