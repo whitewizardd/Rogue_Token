@@ -108,7 +108,6 @@ contract RogueStaking is Ownable(msg.sender), AccessControl {
 
     function changeStakeAmount(uint256 amount) external onlyRole(governanceContract) {
         checkInput(amount);
-        console.log("inside the stake contract ::: ",amount);
         minimumStakeAmount = amount;
     }
 
